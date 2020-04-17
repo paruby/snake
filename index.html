@@ -1,6 +1,166 @@
 <html>
-<header><title>This is title</title></header>
+<header><title>This is title</title>
+
+<script>
+class Board {
+    constructor(canvas){
+        this.canvas = canvas; 
+        this.length = 1;
+        this.direction = "D";
+        this.positions = [[5,10]];
+        this.box_dim = 10;
+        this.grid_size = 20;
+        this.context = this.canvas.getContext("2d");
+        var random_pos_x = Math.floor(Math.random() * 20);
+        var random_pos_y = Math.floor(Math.random() * 20);
+        this.food = [random_pos_x, random_pos_y];
+    }
+    plot(obj) {
+        obj.context.fillStyle = "#FFFFFF";
+        obj.context.fillRect(0, 0, 
+            obj.box_dim * obj.grid_size, obj.box_dim * obj.grid_size);
+
+        obj.context.fillStyle = "#000000";
+        obj.context.fillRect(0, 0, 1, obj.box_dim * obj.grid_size);
+        obj.context.fillRect(0, 0, obj.box_dim * obj.grid_size, 1);
+        obj.context.fillRect(0, obj.box_dim * obj.grid_size - 1, 
+            obj.box_dim * obj.grid_size, 1);
+        obj.context.fillRect(obj.box_dim * obj.grid_size - 1, 0, 
+            1, obj.box_dim * obj.grid_size);
+
+        obj.context.fillStyle = "#0000FF";
+        obj.context.fillRect(
+            obj.food[0] * obj.box_dim, obj.food[1] * obj.box_dim, 
+            obj.box_dim, obj.box_dim
+        );
+
+        obj.context.fillStyle = "#FF0000";
+        
+        var i;
+        var x;
+        var y;
+        for (i=0; i < obj.positions.length; i++){
+            x = obj.positions[i][0];
+            y = obj.positions[i][1];
+            obj.context.fillRect(
+                x * obj.box_dim, y * obj.box_dim, 
+                obj.box_dim, obj.box_dim
+            );
+        }
+        document.getElementById('score').innerHTML = obj.positions.length
+
+
+        return; 
+    }
+    new_food(obj){
+        var random_pos_x = Math.floor(Math.random() * obj.grid_size);
+        var random_pos_y = Math.floor(Math.random() * obj.grid_size);
+        
+        while (obj.check_intersects(obj, [random_pos_x, random_pos_y])){
+            random_pos_x = Math.floor(Math.random() * obj.grid_size);
+            random_pos_y = Math.floor(Math.random() * obj.grid_size);
+        }
+        obj.food = [random_pos_x, random_pos_y];
+    }
+
+    check_intersects(obj, coords){
+        var x;
+        var y;
+        var i;
+        for (i=0; i < obj.positions.length; i++){
+            x = obj.positions[i][0];
+            y = obj.positions[i][1];
+            if ((x == coords[0]) && (y == coords[1])){
+                return Boolean(1);
+            }
+        }
+        return Boolean(0);
+    }
+
+    end_if_intersects(obj, new_head){
+        var x;
+        var y;
+        var i;
+        for (i=0; i < obj.positions.length; i++){
+            x = obj.positions[i][0];
+            y = obj.positions[i][1];
+            if ((x == new_head[0]) && (y == new_head[1]) || 
+                (new_head[0] < 0 || new_head[1] < 0 || new_head[0] >
+                    obj.grid_size - 1 ||
+                    new_head[1] > obj.grid_size - 1) ){
+                window.clearInterval(interval);
+                document.getElementById('status').innerHTML = "Game over! Your score:";
+            }
+        }
+    }
+
+    update_step(obj){
+        var head = obj.positions[obj.positions.length - 1];
+        var new_head;
+        if (obj.direction == "D"){
+            new_head = [head[0], head[1] + 1];
+        } else if (obj.direction == "U"){
+            new_head = [head[0], head[1] - 1];
+        } else if (obj.direction == "R"){
+            new_head = [head[0] + 1, head[1]];
+        } else if (obj.direction == "L"){
+            new_head = [head[0] - 1, head[1]];
+        }
+
+        obj.end_if_intersects(obj, new_head);
+
+        obj.positions.push(new_head);
+        if (new_head[0] != obj.food[0] | new_head[1] != obj.food[1]){
+            obj.positions.shift();
+        } else {
+            obj.new_food(obj);
+        }
+        obj.plot(obj);
+        return;
+    }
+}
+
+var interval;
+
+function begin_game() {
+    var c = document.getElementById("snake_board");
+    snake_game = new Board(c);
+    document.getElementById('status').innerHTML = "Score:";
+    document.getElementById('button').innerHTML = "Restart game";
+    interval = window.setInterval(
+        () => snake_game.update_step(snake_game), 200);
+}
+
+document.onkeydown = function (e) {
+    e = e || window.event;
+    if (e.keyCode == 37){
+        snake_game.direction = "L";
+    } else if (e.keyCode == 38){
+        snake_game.direction = "U";
+    } else if (e.keyCode == 39){
+        snake_game.direction = "R";
+    } else if (e.keyCode == 40){
+        snake_game.direction = "D";
+    }
+
+};
+
+
+</script>
+</header>
 <body>
-Hello world
+
+Use the up/down/left/right arrow keys on your keyboard to control your snake.
+
+<br>
+
+<canvas id="snake_board" width="200" height="200"></canvas>
+<br>
+
+<div id="status">Score: </div> <div id="score"></div> 
+
+<br>
+<button id="button" onclick=begin_game()>Begin game</button>
+
 </body>
 </html>
