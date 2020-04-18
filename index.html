@@ -133,13 +133,13 @@ function begin_game() {
 
 document.onkeydown = function (e) {
     e = e || window.event;
-    if (e.keyCode == 37){
+    if (e.keyCode == 37 && snake_game.direction != "R"){
         snake_game.direction = "L";
-    } else if (e.keyCode == 38){
+    } else if (e.keyCode == 38 && snake_game.direction != "D"){
         snake_game.direction = "U";
-    } else if (e.keyCode == 39){
+    } else if (e.keyCode == 39 && snake_game.direction != "L"){
         snake_game.direction = "R";
-    } else if (e.keyCode == 40){
+    } else if (e.keyCode == 40 && snake_game.direction != "U"){
         snake_game.direction = "D";
     }
 
