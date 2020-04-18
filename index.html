@@ -139,8 +139,21 @@ function begin_game() {
     snake_game = new Board(c);
     document.getElementById('status').innerHTML = "Score:";
     document.getElementById('button').innerHTML = "Restart game";
+    var speed;
+    if (document.getElementById('r1').checked){
+        speed = 200
+    } else if (document.getElementById('r2').checked) {
+        speed = 150
+    } else if (document.getElementById('r3').checked) {
+        speed = 100
+    } else if (document.getElementById('r4').checked) {
+        speed = 50
+    }
+    if (interval){
+        window.clearInterval(interval);
+    }
     interval = window.setInterval(
-        () => snake_game.update_step(snake_game), 200);
+        () => snake_game.update_step(snake_game), speed);
 }
 
 document.onkeydown = function (e) {
@@ -170,7 +183,13 @@ Use the up/down/left/right arrow keys on your keyboard to control your snake.
 <br>
 
 <div id="status">Score: </div> <div id="score"></div> 
-
+<br>
+Difficulty:
+  <input id="r1" type="radio" name="difficulty" value="easy" checked /> Easy
+  <input id="r2" type="radio" name="difficulty" value="medium" /> Medium
+  <input id="r3" type="radio" name="difficulty" value="hard" /> Hard
+  <input id="r4" type="radio" name="difficulty" value="madness" /> Madness
+<!--<input id='difficulty' type="range" min="1" max="7" value="3"> -->
 <br>
 <button id="button" onclick=begin_game()>Begin game</button>
 
